@@ -32,11 +32,20 @@ void setup() {
 
 int counter = 0;
 int COUNTER_MAX = 240;
+int y_offset = 0;
 
 void loop() {
-  //TODO serial receive
+  //TODO receive 240 bytes over serial port
   //push one row of pixels(
+  tft->setAddrWindow(0, counter, 240, 1);
+  tft->startWrite();
+  //offset pixels
+  y_offset = random(240);
   tft->pushBlock(0x0, counter);
-  tft->pushBlock(0xFFFF, 240-counter);
+  tft->pushBlock(0xFFFF, 240-y_offset);
+  tft->endWrite();
   counter++;
+  if(counter >= COUNTER_MAX){
+    counter = 0;    
+  }
 }
