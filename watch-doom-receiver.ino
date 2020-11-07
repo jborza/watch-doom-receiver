@@ -12,12 +12,6 @@ void setup() {
 
   tft = ttgo->tft;
 
-  tft->fillScreen(TFT_BLACK);
-  tft->setTextFont(2);
-  tft->setTextSize(1);
-  tft->setTextColor(TFT_WHITE);
-  tft->setCursor(0, 0);
-
   //splash screen
   ttgo->tft->fillScreen(TFT_BLACK);
   ttgo->tft->setTextSize(2);
@@ -30,22 +24,28 @@ void setup() {
   delay(1000);
 }
 
-int counter = 0;
-int COUNTER_MAX = 240;
+int y = 0;
+int Y_MAX = 240;
 int y_offset = 0;
+char rxBuffer[240/8];
+uint16_t lineBuffer[240];
 
 void loop() {
-  //TODO receive 240 bytes over serial port
-  //push one row of pixels(
-  tft->setAddrWindow(0, counter, 240, 1);
-  tft->startWrite();
+  //receive 240 bytes over serial port
+  //then push one row of pixels to the screen
+  Serial.readBytes(rxBuffer, 30); 
+  tft->setAddrWindow(0, y, 240, 1);
   //offset pixels
-  y_offset = random(240);
-  tft->pushBlock(0x0, counter);
-  tft->pushBlock(0xFFFF, 240-y_offset);
+  //convert my rxBuffer to black and white pixels
+  for(int i = 0; i < 240; i++){
+    int remainder = 7 - i % 8;
+    lineBuffer[i] = (((rxBuffer[i / 8] >> (remainder)) & 1) == 1 ? 0 : 0xFFFF);
+  }
+  tft->startWrite();
+  tft->pushPixels(lineBuffer, 240);
   tft->endWrite();
-  counter++;
-  if(counter >= COUNTER_MAX){
-    counter = 0;    
+  y++;
+  if(y >= Y_MAX){
+    y = 0;    
   }
 }
