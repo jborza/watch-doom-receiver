@@ -3,6 +3,8 @@
 TTGOClass *ttgo;
 TFT_eSPI *tft;
 
+#define INVERT_COLORS
+
 void setup() {
 
   //Set up the display
@@ -48,7 +50,11 @@ void loop() {
   for(int i = 0; i < RECEIVE_LINE_BITS; i++){
     //bit 0 -> pixel 0,1; bit 1 -> pixel 1,2
     int remainder = 7 - i % 8;
+#ifdef INVERT_COLORS
+    int color = (((rxBuffer[i / 8] >> (remainder)) & 1) == 1 ? 0xFFFF : 0);
+#else
     int color = (((rxBuffer[i / 8] >> (remainder)) & 1) == 1 ? 0 : 0xFFFF);
+#endif
     lineBuffer[i*2] = color;
     lineBuffer[i*2+1] = color;
   }
