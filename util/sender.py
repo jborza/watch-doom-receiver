@@ -4,7 +4,7 @@ import serial
 import random
 from PIL import Image 
 
-im = Image.open("lenna-dithered.png")
+im = Image.open("lenna-dithered-120.png")
 
 ser = serial.Serial('COM8', 115200)
 print(f'printing to {ser.name}')
@@ -12,9 +12,9 @@ print(f'printing to {ser.name}')
 
 #prepare pixel data of the image
 rows = []
-for y in range(0, 240):
+for y in range(0, 120):
     row_bytes = []
-    for x in range(0, 240, 8):
+    for x in range(0, 120, 8):
         #get 8 bits at a time
         byte = 0
         for x_offset in range(0,8):
@@ -28,8 +28,9 @@ for y in range(0, 240):
 #generate a simple pattern
 counter = 0
 frame = 0
+#offset the rows by one
 while True:
-    for y in range(0, 240):
+    for y in range(0, 120):
         #generate row data based on the counter
         ser.write(rows[y])
         #for byte in rows[y]:
