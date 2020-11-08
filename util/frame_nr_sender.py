@@ -33,12 +33,14 @@ def draw_frame(number):
         number = number % 120
     frame_txt = f'Frame {number:03}'
     fps_txt = f'{last_fps:02} FPS'
-    draw.rectangle((0, 0, imgx, imgy), fill=(0))
-    draw.line((0,0,number,imgy), fill=(255))
-    draw.line((0,0,imgx,number), fill=(255))
-    draw.line((number,0,imgx,imgy/2), fill=(255))
-    draw.line((number,imgy,imgx,imgy/2), fill=(255))
-    draw.line((number,imgy,number,imgy/2), fill=(255))
+
+    draw.rectangle((0, 0, imgx, imgy), fill=(0))            #clear screen
+    draw.line((0,0,number,imgy), fill=(255))                #line converging on 120,120
+    draw.line((0,0,imgx,number), fill=(255))                #line converging on 120,120
+    draw.line((number,0,imgx,imgy/2), fill=(255))           #line converging on 120,60
+    draw.line((number,imgy,imgx,imgy/2), fill=(255))        #line converging on 120,120
+    draw.line((10,number,imgx-10,imgy-number), fill=(255))      #spinner part 1
+    draw.line((imgx-number,10,number,imgy-10), fill=(255))      #spinner part 2
     draw.text((10,10), frame_txt, fill=(255))
     draw.text((30,80), fps_txt, fill=(255))
     draw.text((number/4,number/2), "boo", fill=(255))
