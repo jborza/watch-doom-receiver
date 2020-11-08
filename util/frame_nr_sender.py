@@ -9,6 +9,8 @@ imgx = 120
 imgy = 120
 image = Image.new("1", (imgx, imgy))
 draw = ImageDraw.Draw(image)
+VSYNC = b'V'
+HSYNC = b'H'
 
 def get_row_bytes(image, row):
     y = row
@@ -34,8 +36,8 @@ def draw_frame(number):
     draw.rectangle((0, 0, imgx, imgy), fill=(0))
     draw.line((0,0,number,imgy), fill=(255))
     draw.line((0,0,imgx,number), fill=(255))
-    draw.line((number,0,number,imgy), fill=(255))
-    draw.line((number,0,number,imgy/2), fill=(255))
+    draw.line((number,0,imgx,imgy/2), fill=(255))
+    draw.line((number,imgy,imgx,imgy/2), fill=(255))
     draw.line((number,imgy,number,imgy/2), fill=(255))
     draw.text((10,10), frame_txt, fill=(255))
     draw.text((30,80), fps_txt, fill=(255))
@@ -59,8 +61,9 @@ def info(type, value, tb):
 
 #sys.excepthook = info
 
-ser = serial.Serial('COM8', 250000)
-print(f'printing to {ser.name}')
+ser = serial.Serial('COM8', 500000)
+ser.timeout = None
+print(f'printing to {ser.name}, timeout={ser.timeout}')
 last_second = 0
 current_fps = 0
 last_fps = 0
@@ -73,7 +76,11 @@ while True:
     #send out rows over the serial port
     for row in range(0, imgy):
         ser.write(get_row_bytes(image, row))
-        #print('.', end='')
+        if ser.in_waiting:
+            response = ser.read()
+            if(response == VSYNC): 
+                print('.', end='')
+                break
     frame = frame + 1
     current_fps = current_fps + 1
     #recalculate fps
