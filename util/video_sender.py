@@ -3,6 +3,8 @@ import serial
 import pdb
 import sys
 import datetime
+from time import sleep
+VSYNC = b'V'
 
 # image size 
 imgx = 120
@@ -27,8 +29,7 @@ def get_row_bytes(image, row):
 
 def draw_frame(number):
     global image
-    filename = f'c:/temp/bmp-dithered/out-filename{number:05}.bmp.png'
-    print(filename)
+    filename = f'c:/temp/bmp-rickroll2/out-filename{number:05}.bmp.png'
     image = Image.open(filename)
 
 def info(type, value, tb):
@@ -47,7 +48,7 @@ def info(type, value, tb):
 
 #sys.excepthook = info
 
-ser = serial.Serial('COM8', 250000)
+ser = serial.Serial('COM8', 500000)
 print(f'printing to {ser.name}')
 last_second = 0
 current_fps = 0
@@ -61,6 +62,11 @@ while True:
     #send out rows over the serial port
     for row in range(0, imgy):
         ser.write(get_row_bytes(image, row))
+        if ser.in_waiting:
+            response = ser.read()
+            if(response == VSYNC): 
+                print('.', end='')
+                break
         #print('.', end='')
     frame = frame + 1
     current_fps = current_fps + 1
@@ -69,3 +75,4 @@ while True:
         last_second = datetime.datetime.now().second
         last_fps = current_fps
         current_fps = 0
+    
