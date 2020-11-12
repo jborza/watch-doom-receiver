@@ -3,14 +3,15 @@
 TTGOClass *ttgo;
 TFT_eSPI *tft;
 
-#define INVERT_COLORS
+//#define INVERT_COLORS
 
 #define DISPLAY_LINE_LENGTH 240
 #define RECEIVE_LINE_BITS 240
 #define RECEIVE_LINE_BYTES 240/8
-#define BAUD_RATE 500000
+#define BAUD_RATE 921600
 #define HSYNC 0x48
 #define VSYNC 0x56
+#define COLOR 0x07E0
 
 int y = 0;
 int Y_MAX = 240;
@@ -34,7 +35,7 @@ void setup() {
   ttgo->tft->print(F("Serial @ "));
   ttgo->tft->print(BAUD_RATE);
   Serial.begin(BAUD_RATE);
-
+  ttgo->tft->initDMA(); 
   delay(2000);
 }
 
@@ -57,18 +58,29 @@ void loop() {
     for(int x = 0; x < RECEIVE_LINE_BYTES; x++){
       rx = rxBuffer[x];
       idx = x << 3;
-      lineBuffer[idx] = (((rx >> 7) & 1) == 1 ? 0xFFFF : 0);
-      lineBuffer[idx+1] = (((rx >> 6) & 1) == 1 ?  0xFFFF : 0);
-      lineBuffer[idx+2] = (((rx >> 5) & 1) == 1 ?  0xFFFF : 0);
-      lineBuffer[idx+3] = (((rx >> 4) & 1) == 1 ?  0xFFFF : 0);
-      lineBuffer[idx+4] = (((rx >> 3) & 1) == 1 ?  0xFFFF : 0);
-      lineBuffer[idx+5] = (((rx >> 2) & 1) == 1 ?  0xFFFF : 0);
-      lineBuffer[idx+6] = (((rx >> 1) & 1) == 1 ?  0xFFFF : 0);
-      lineBuffer[idx+7] = (((rx) & 1) == 1 ?  0xFFFF : 0);
+      #ifdef INVERT_COLORS
+      lineBuffer[idx] = (((rx >> 7) & 1) == 1 ? 0 : COLOR);
+      lineBuffer[idx+1] = (((rx >> 6) & 1) == 1 ?  0: COLOR);
+      lineBuffer[idx+2] = (((rx >> 5) & 1) == 1 ?  0:COLOR);
+      lineBuffer[idx+3] = (((rx >> 4) & 1) == 1 ? 0: COLOR);
+      lineBuffer[idx+4] = (((rx >> 3) & 1) == 1 ? 0 : COLOR);
+      lineBuffer[idx+5] = (((rx >> 2) & 1) == 1 ? 0 : COLOR);
+      lineBuffer[idx+6] = (((rx >> 1) & 1) == 1 ? 0 : COLOR);
+      lineBuffer[idx+7] = (((rx) & 1) == 1 ? 0 : COLOR );
+      #else
+      lineBuffer[idx] = (((rx >> 7) & 1) == 1 ? COLOR : 0);
+      lineBuffer[idx+1] = (((rx >> 6) & 1) == 1 ?  COLOR : 0);
+      lineBuffer[idx+2] = (((rx >> 5) & 1) == 1 ?  COLOR : 0);
+      lineBuffer[idx+3] = (((rx >> 4) & 1) == 1 ?  COLOR : 0);
+      lineBuffer[idx+4] = (((rx >> 3) & 1) == 1 ?  COLOR : 0);
+      lineBuffer[idx+5] = (((rx >> 2) & 1) == 1 ?  COLOR : 0);
+      lineBuffer[idx+6] = (((rx >> 1) & 1) == 1 ?  COLOR : 0);
+      lineBuffer[idx+7] = (((rx) & 1) == 1 ?  COLOR : 0);
+      #endif
    }
   
   tft->startWrite();
-  tft->pushPixels(lineBuffer, DISPLAY_LINE_LENGTH);
+  tft->pushPixelsDMA(lineBuffer, DISPLAY_LINE_LENGTH);
   tft->endWrite();
   y+=1;
   if(y >= Y_MAX){
