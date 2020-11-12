@@ -5,8 +5,8 @@ import sys
 import datetime
 
 # image size 
-imgx = 120
-imgy = 120
+imgx = 240
+imgy = 240
 image = Image.new("1", (imgx, imgy))
 draw = ImageDraw.Draw(image)
 VSYNC = b'V'
