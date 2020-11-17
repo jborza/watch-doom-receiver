@@ -33,15 +33,6 @@ while True:
     for y in range(0, 120):
         #generate row data based on the counter
         ser.write(rows[y])
-        #for byte in rows[y]:
-        #    ser.write(byte)
-        #if(y % 2 == 0):
-        #    ser.write(b'generate a simple pattern    .')
-        #else:
-        #    ser.write(b'0123456789ABCDEFGHIJKLMNOPQRST')
-        #pixels[i]
-        #ser.write(y)
-        #ser.write(b'0123456789ABCDEFGHIJKLMNOPQRST')
     print('.')
     frame = frame + 1
 
